@@ -1,6 +1,6 @@
 {
-    "name": "my_test_app",
-    "short_name": "my_test_app",
+    "name": "save_cash",
+    "short_name": "save_cash",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,4 +1,4 @@
-package com.example.my_test_app
+package com.example.save_cash
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
+import 'package:sms_receiver/sms_receiver.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class Home extends StatefulWidget {
@@ -25,9 +26,11 @@ class _HomeState extends State<Home> {
     var status = await Permission.sms.status;
     if (status.isGranted) {
       _fetchSmsMessages();
+      _listenForIncomingSms();
     } else if (status.isDenied) {
       if (await Permission.sms.request().isGranted) {
         _fetchSmsMessages();
+        _listenForIncomingSms();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -54,6 +57,36 @@ class _HomeState extends State<Home> {
               message.body!.startsWith("Transfert effectue pour"))
           .toList();
     });
+  }
+
+  void _listenForIncomingSms() {
+    SmsReceiver((String? messageBody) {
+      if (messageBody != null &&
+          messageBody.startsWith("Transfert effectue pour")) {
+        print(messageBody);
+        // Déclenche une alerte
+        _showSmsAlert(messageBody);
+
+        // Réactualise la liste des SMS filtrés
+        _fetchSmsMessages();
+      }
+    });
+  }
+
+  void _showSmsAlert(String messageBody) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Nouveau SMS reçu"),
+        content: Text(messageBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

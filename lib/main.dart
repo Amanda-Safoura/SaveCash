@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'dart:async'; // Pour utiliser Timer
+import 'dart:async';
+
+import 'package:save_cash/views/connexion.dart';
+import 'package:save_cash/views/inscription.dart'; // Pour utiliser Timer
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -11,9 +14,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const Launch(),
+      home: Launch(),
       routes: {
-        '/connexion': (context) => const Connexion(),
+        '/inscription': (context) => Inscription(),
+        '/connexion': (context) => Connexion(),
       },
     );
   }
@@ -47,22 +51,6 @@ class _LaunchState extends State<Launch> {
           height: 350,
           fit: BoxFit.contain,
         ),
-      ),
-    );
-  }
-}
-
-class Connexion extends StatelessWidget {
-  const Connexion({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Connexion"),
-      ),
-      body: const Center(
-        child: Text("Page de Connexion"),
       ),
     );
   }

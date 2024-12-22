@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:save_cash/views/home.dart';
+import 'package:save_cash/views/inscription.dart';
+import 'package:save_cash/db/db_helper.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -10,9 +13,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const Connexion(),
+      home: Connexion(),
       routes: {
-        '/inscription': (context) => const Inscription(),
+        '/inscription': (context) => Inscription(),
       },
     );
   }
@@ -29,12 +32,72 @@ class _ConnexionState extends State<Connexion> {
   String numero = '';
   final _formKey = GlobalKey<FormState>();
 
-  void _submitForm() {
+  final DbHelper dbHelper =
+      DbHelper(); // Instance du helper pour la base de données
+  final TextEditingController numeroController =
+      TextEditingController(); // Contrôleur pour le champ de saisie
+
+  // Fonction pour vérifier si le numéro existe dans la base de données
+  void checkUser() async {
+    final numero =
+        numeroController.text.trim(); // Récupère le numéro sans espace
+
+    if (numero.isEmpty || numero.isEmpty) {
+      // Afficher un message de succès ou de redirection
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(numero)),
+      );
+      // Affiche une alerte si le champ est vide
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Erreur"),
+          content: const Text("Veuillez entrer un numéro de téléphone."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // Recherche de l'utilisateur dans la base de données
+    final user = await dbHelper.getUserByNumero(numero);
+    if (user != null) {
+      // Si l'utilisateur est trouvé, redirige vers la page UserDetails
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Home(user: user),
+        ),
+      );
+    } else {
+      // Si l'utilisateur n'est pas trouvé, affiche une alerte
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Erreur"),
+          content: const Text("Utilisateur non trouvé."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  /* void _submitForm() {
     if (_formKey.currentState!.validate()) {
       // Traitement de l'envoi
       print('Numéro envoyé: $numero');
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +129,7 @@ class _ConnexionState extends State<Connexion> {
                 Form(
                   key: _formKey,
                   child: TextFormField(
+                    controller: numeroController,
                     decoration: InputDecoration(
                       hintText: 'Numéro de téléphone',
                       hintStyle: const TextStyle(color: Colors.black),
@@ -80,12 +144,13 @@ class _ConnexionState extends State<Connexion> {
                     keyboardType: TextInputType.phone,
                     onChanged: (value) {
                       setState(() {
+                        print(numeroController.text);
                         numero = value;
                       });
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Veuillez entrer un numéro de téléphone';
+                        return 'Veuillez entrer un numéro de téléphone valide';
                       }
                       return null;
                     },
@@ -94,16 +159,16 @@ class _ConnexionState extends State<Connexion> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: const Color(0xFFAEFF7F),
+                    surfaceTintColor: Colors.black,
+                    textStyle: const TextStyle(color: Color(0xFFAEFF7F)),
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: _submitForm,
+                  onPressed: checkUser,
                   child: const Text(
-                    'Envoyer',
+                    'Envoi',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -128,22 +193,6 @@ class _ConnexionState extends State<Connexion> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class Inscription extends StatelessWidget {
-  const Inscription({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Inscription'),
-      ),
-      body: const Center(
-        child: Text('Page d\'inscription'),
       ),
     );
   }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:save_cash/views/connexion.dart';
+import "package:save_cash/db/db_helper.dart";
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -10,9 +12,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const Inscription(),
+      home: Inscription(),
       routes: {
-        '/connexion': (context) => const Connexion(),
+        '/connexion': (context) => Connexion(),
       },
     );
   }
@@ -34,13 +36,40 @@ class _InscriptionState extends State<Inscription> {
 
   final _formKey = GlobalKey<FormState>();
 
-  void _submitForm() {
+// Instance de la classe DbHelper pour insérer les données dans SQLite
+  final DbHelper dbHelper = DbHelper();
+
+  // Fonction pour soumettre le formulaire et enregistrer les données dans la base de données
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      // Traitement de l'inscription
-      print(
-          'Nom: $nom, Prénom: $prenom, Numéro: $numero, PIN: $pin, Taux: $taux');
+      // Créer un objet avec les données de l'utilisateur
+      Map<String, dynamic> user = {
+        'nom': nom,
+        'prenom': prenom,
+        'numero': numero,
+        'pin': pin,
+        'taux': taux,
+      };
+
+      // Insérer les données dans la base de données
+      await dbHelper.insertUser(user);
+
+      // Afficher un message de succès ou de redirection
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Inscription réussie!')),
+      );
+
+      // Tu peux également naviguer vers une autre page si nécessaire
+      Navigator.pushNamed(context, '/connexion');
     }
   }
+  // void _submitForm() {
+  //   if (_formKey.currentState!.validate()) {
+  //     // Traitement de l'inscription
+  //     print(
+  //         'Nom: $nom, Prénom: $prenom, Numéro: $numero, PIN: $pin, Taux: $taux');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -206,8 +235,8 @@ class _InscriptionState extends State<Inscription> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: const Color(0xFFAEFF7F),
+                    // primary: Colors.black,
+                    // onPrimary: Color(0xFFAEFF7F),
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -240,22 +269,6 @@ class _InscriptionState extends State<Inscription> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class Connexion extends StatelessWidget {
-  const Connexion({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Connexion'),
-      ),
-      body: const Center(
-        child: Text('Page de connexion'),
       ),
     );
   }

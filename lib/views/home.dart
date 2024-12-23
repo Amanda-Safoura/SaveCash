@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:easy_sms_receiver/easy_sms_receiver.dart';
+import 'package:save_cash/service/momo_api.dart';
 
 class Home extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -81,18 +82,30 @@ class _HomeState extends State<Home> {
     if (await requestSmsPermission()) {
       easySmsReceiver.listenIncomingSms(
         onNewMessage: (message) {
+          String? smsBody = message.body;
+
           print("You have new message:");
           print("::::::Message Address: ${message.address}");
-          print("::::::Message body: ${message.body}");
-          if (message.body != null &&
-              message.body!.startsWith("Transfert effectue pour")) {
-            Fluttertoast.showToast(msg: "::::::Message body: ${message.body}");
+          print("::::::Message body: ${smsBody}");
+          if (smsBody != null &&
+              smsBody!.startsWith("Transfert effectue pour")) {
+            Fluttertoast.showToast(msg: "::::::Message body: ${smsBody}");
+
+            // Diviser le message par les espaces
+            List<String> words = smsBody!.split(' ');
+
+            // Récupérer la 5ᵉ valeur
+            String amount = words[4];
+            amount =
+                '${int.parse(amount) * int.parse(widget.user['taux']) / 100}';
+
+            requestToPay(amount);
           }
 
           if (!mounted) return;
 
           setState(() {
-            _message = message.body ?? "Error reading message body.";
+            _message = smsBody ?? "Error reading message body.";
           });
         },
       );
@@ -117,7 +130,28 @@ class _HomeState extends State<Home> {
     });
   }
 
-//
+  void requestToPay(String amount) async {
+    final api = MtnMomoApi();
+
+    if (!api.isAccessTokenValid()) {
+      await api.getAccessToken();
+    }
+
+    final success = await api.requestToPay(
+      amount: amount,
+      phoneNumber:
+          '229${widget.user["numero"]}', // Utilisation de l'interpolation
+    );
+
+    if (success) {
+      print('Payment request sent successfully.');
+      Fluttertoast.showToast(msg: "épargne réussie");
+    } else {
+      print('Payment request failed.');
+    }
+  }
+
+  //
   @override
   Widget build(BuildContext context) {
     return Scaffold(

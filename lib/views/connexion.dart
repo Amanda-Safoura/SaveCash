@@ -4,7 +4,7 @@ import 'package:save_cash/views/inscription.dart';
 import 'package:save_cash/db/db_helper.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -13,9 +13,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Connexion(),
+      home: const Connexion(),
       routes: {
-        '/inscription': (context) => Inscription(),
+        '/inscription': (context) => const Inscription(),
       },
     );
   }
@@ -92,12 +92,12 @@ class _ConnexionState extends State<Connexion> {
     }
   }
 
-  /* void _submitForm() {
+  void _submitForm() {
     if (_formKey.currentState!.validate()) {
       // Traitement de l'envoi
       print('Numéro envoyé: $numero');
     }
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {

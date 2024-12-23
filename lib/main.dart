@@ -3,9 +3,10 @@ import 'dart:async';
 
 import 'package:save_cash/views/connexion.dart';
 import 'package:save_cash/views/inscription.dart'; // Pour utiliser Timer
+import 'package:save_cash/views/home.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -14,10 +15,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Launch(),
+      home: const Launch(),
       routes: {
-        '/inscription': (context) => Inscription(),
-        '/connexion': (context) => Connexion(),
+        '/inscription': (context) => const Inscription(),
+        '/connexion': (context) => const Connexion(),
       },
     );
   }

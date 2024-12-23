@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Inscription(),
       routes: {
-        '/connexion': (context) => Connexion(),
+        '/connexion': (context) => const Connexion(),
       },
     );
   }

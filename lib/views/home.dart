@@ -148,6 +148,8 @@ class _HomeState extends State<Home> {
       Fluttertoast.showToast(msg: "épargne réussie");
     } else {
       print('Payment request failed.');
+
+      Fluttertoast.showToast(msg: 'Payment request failed.');
     }
   }
 

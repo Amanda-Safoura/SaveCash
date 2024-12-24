@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class MtnMomoApi {
   final String apiUser = "371863e2-b2d7-49a1-bb35-0d8267d65067";
@@ -60,10 +61,15 @@ class MtnMomoApi {
     if (accessToken == null) {
       print(
           'Access token is not available. Cannot proceed with request to pay.');
+      Fluttertoast.showToast(
+          msg:
+              'Access token is not available. Cannot proceed with request to pay.');
       return false;
     }
 
     print(accessToken);
+    Fluttertoast.showToast(
+        msg: 'access token : ${accessToken}', toastLength: Toast.LENGTH_LONG);
 
     final String uuid = const Uuid().v4();
     final Uri url = Uri.parse(
@@ -83,6 +89,8 @@ class MtnMomoApi {
     };
 
     print(body);
+    Fluttertoast.showToast(
+        msg: body.toString(), toastLength: Toast.LENGTH_LONG);
 
     try {
       final response = await http.post(
@@ -99,14 +107,22 @@ class MtnMomoApi {
 
       if (response.statusCode == 202) {
         print('Request to pay initiated successfully.');
+        Fluttertoast.showToast(msg: 'Request to pay initiated successfully.');
         return true;
       } else {
         print(
             'Failed to initiate request to pay. Status code: ${response.statusCode}, Body: ${response.body}');
+        Fluttertoast.showToast(
+            msg:
+                'Failed to initiate request to pay. Status code: ${response.statusCode}, Body: ${response.body}',
+            toastLength: Toast.LENGTH_LONG);
         return false;
       }
     } catch (e) {
       print('Error occurred while initiating request to pay: $e');
+      Fluttertoast.showToast(
+          msg: 'Error occurred while initiating request to pay: $e',
+          toastLength: Toast.LENGTH_LONG);
       return false;
     }
   }
